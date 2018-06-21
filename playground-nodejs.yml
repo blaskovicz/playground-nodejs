@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://127.0.0.1:8082
+
+functions:
+  playground-nodejs:
+    lang: Dockerfile
+    skip_build: true
+    image: 127.0.0.1:5000/playground-nodejs

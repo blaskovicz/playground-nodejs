@@ -1,0 +1,15 @@
+{
+  "name": "playground-nodejs",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "prettier": "^1.13.5",
+    "vm2": "^3.6.0"
+  },
+  "devDependencies": {
+    "eslint-plugin-node": "^6.0.1"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}
