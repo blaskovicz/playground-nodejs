@@ -43,16 +43,35 @@ class StreamReader extends EventEmitter {
 }
 
 class JavaScriptControl {
-  format(input = "") {
+  format(input = "", lang = "js") {
+    if (lang !== "js" && lang !== "ts")
+      throw new Error(`unknown lang ${lang} provided`);
     const prettier = require("prettier");
     return prettier.format(input, {
       parser: "babylon",
       semi: true,
     });
   }
-  compile(input = "") {
+  compile(input = "", lang = "js") {
+    if (lang !== "js" && lang !== "ts")
+      throw new Error(`unknown lang ${lang} provided`);
+    if (lang === "ts") {
+      const ts = require("typescript");
+      const res = ts.transpileModule(input, {
+        compilerOptions: {
+          target: "es5",
+          lib: ["es2018", "esnext"],
+          types: ["node"],
+          declaration: true,
+          esModuleInterop: true,
+          moduleResolution: "node",
+        },
+      });
+      input = res.outputText;
+    }
     const { VMScript } = require("vm2");
     new VMScript(input).compile();
+    return input;
   }
   async execute(input = "") {
     // [{"Message": "hi", "Kind": "stdout", "Delay": 0}, ...]
@@ -124,12 +143,16 @@ function main() {
       switch (args.Mode) {
         case "compile":
           return writeFunctionResponse({
-            Events: await control.execute(args.Body),
+            Events: await control.execute(
+              control.compile(args.Body, args.Language)
+            ),
           });
         case "fmt":
         case "format": {
-          control.compile(args.Body);
-          return writeFunctionResponse({ Body: control.format(args.Body) });
+          control.compile(args.Body, args.Language);
+          return writeFunctionResponse({
+            Body: control.format(args.Body, args.Language),
+          });
         }
         default: {
           throw new Error(`unknown mode: ${args.Mode}`);
