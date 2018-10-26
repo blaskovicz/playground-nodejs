@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:10-alpine
 
 # add function watchdog
 ADD https://github.com/openfaas/faas/releases/download/0.7.1/fwatchdog /usr/bin/fwatchdog
